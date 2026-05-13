@@ -154,9 +154,11 @@ In your notebook:
 1. Import this class and run inference on 5 test images. Print the top-3 predictions for each.
 2. Verify the predictions match what your PyTorch model produces for the same images.
 
-### Task 3 — Quantise to INT8
+### Task 3 — Quantise to INT8 and Benchmark All Three Variants
 
-Apply post-training dynamic quantisation:
+Apply post-training dynamic quantisation, check its quality, and benchmark the three variants (PyTorch, FP32 ONNX, INT8 ONNX) on the same hardware.
+
+1. Apply dynamic quantisation and report the resulting file size and size ratio vs FP32 ONNX:
 
 ```python
 from onnxruntime.quantization import quantize_dynamic, QuantType
@@ -168,29 +170,14 @@ quantize_dynamic(
 )
 ```
 
-Then:
-
-1. Print the file size of the quantised model and the size ratio vs FP32.
-2. Load the quantised model into a new ONNX Runtime session.
-3. Run it on the same validation set used in Task 1 and compare the outputs with the FP32 ONNX model — report the maximum and mean absolute difference.
-4. Run it on the held-out test set (or whatever test loader you have from yesterday) and report the test accuracy. Compare to the FP32 ONNX model's test accuracy.
-
-In a markdown cell, comment on the trade-off: how much accuracy did you lose, and how much smaller is the model?
-
-### Task 4 — Latency Benchmark
-
-Benchmark all three variants on the same hardware.
-
-1. Pick a single image. For each model — PyTorch eager mode, FP32 ONNX, INT8 ONNX — measure the average latency over 100 runs (use `time.perf_counter()`).
-2. Report the results in a table:
+2. Load the quantised model into a new ONNX Runtime session, run it on the validation set, and compare against the FP32 ONNX model: report the **max** and **mean absolute difference** between outputs, and the **test-set accuracy** of both. In a short markdown cell, comment on the accuracy-vs-size trade-off.
+3. Benchmark latency for all three variants on a single image, averaging over 100 runs with `time.perf_counter()`, and fill in the table. Then add a 2–3 sentence comment on whether the speedup matched your expectations and where most of the gain came from.
 
 | Model | File size (MB) | Avg latency (ms) | Speedup vs PyTorch |
 |---|---|---|---|
 | PyTorch (FP32) | … | … | 1.00× |
 | ONNX (FP32) | … | … | … |
 | ONNX (INT8) | … | … | … |
-
-3. In a markdown cell, comment on what you see. Was the speedup what you expected? Where did most of the gain come from?
 
 ## Submission
 
@@ -205,7 +192,7 @@ Benchmark all three variants on the same hardware.
 - [ ] PyTorch model exported to ONNX with dynamic batch axis and validated.
 - [ ] Numerical equivalence between PyTorch and FP32 ONNX confirmed.
 - [ ] Standalone `inference.py` runs and matches PyTorch predictions.
-- [ ] INT8 quantised model produced; size and accuracy compared to FP32.
+- [ ] INT8 quantised model produced; size, accuracy, and latency compared to FP32 (in Task 3).
 - [ ] Latency benchmark table with all three variants.
 - [ ] `Kernel → Restart & Run All` produces no errors.
 
